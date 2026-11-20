@@ -16,7 +16,13 @@ RUN apt-get update \
 
 WORKDIR /srv/termpilot
 COPY requirements.txt .
-RUN pip install -r requirements.txt
+# datrie has no wheel for Python 3.12, so it is compiled here. The compiler is
+# removed again in the same layer to keep the image small.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends gcc libc6-dev \
+    && pip install -r requirements.txt \
+    && apt-get purge -y --auto-remove gcc libc6-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY termpilot ./termpilot
 COPY scripts ./scripts

@@ -70,6 +70,7 @@ termpilot = ["campus/codebook.json", "knowledge/engine/store/es_mapping.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = ["."]
 addopts = "-q -p no:cacheprovider"
 filterwarnings = ["ignore::DeprecationWarning:pdfminer.*"]
 
