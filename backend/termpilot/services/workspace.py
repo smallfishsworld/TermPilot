@@ -101,7 +101,9 @@ class Workspace:
         if "\x00" in text:
             raise InvalidInput("The path contains an invalid character.")
         pure = PurePosixPath(text)
-        if pure.is_absolute() or ".." in pure.parts or (pure.parts and pure.parts[0] == TRASH):
+        # "C:/..." is a relative path on Linux, so drive letters are checked explicitly.
+        has_drive = len(text) >= 2 and text[1] == ":" and text[0].isascii() and text[0].isalpha()
+        if has_drive or pure.is_absolute() or ".." in pure.parts or (pure.parts and pure.parts[0] == TRASH):
             raise InvalidInput("Use a path inside your workspace, such as notes/week05.md.")
         target = (self.root / pure).resolve()
         if target != self.root and self.root not in target.parents:

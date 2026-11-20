@@ -89,7 +89,7 @@ class LibraryIndex:
             row = {key: item[key] for key in _STORED_KEYS if key in item}
             row.update(
                 {
-                    "id": xxhash.xxh64(f"{doc_key}:{position}").hexdigest(),
+                    "id": xxhash.xxh64(f"{doc_key}:{position}".encode()).hexdigest(),
                     "doc_id": doc_key,
                     "kb_id": self.name,
                     "docnm_kwd": filename,
