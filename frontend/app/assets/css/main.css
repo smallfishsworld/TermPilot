@@ -1,0 +1,179 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ---------------------------------------------------------------------------
+   Design tokens. Components use the semantic names (page, surface, line, ink,
+   muted, brand, ...) so light and dark themes only differ here.
+   ------------------------------------------------------------------------- */
+:root {
+  --tp-page: #f4f6f8;
+  --tp-surface: #ffffff;
+  --tp-surface-muted: #eef2f5;
+  --tp-line: #dde3e9;
+  --tp-ink: #0f1b2d;
+  --tp-muted: #5b6b7f;
+  --tp-brand: #0f766e;
+  --tp-brand-strong: #115e59;
+  --tp-brand-soft: #d5f5ef;
+  --tp-accent: #4f46e5;
+  --tp-accent-soft: #e5e4fd;
+  --tp-warn: #b45309;
+  --tp-warn-soft: #fdf0d2;
+  --tp-danger: #be123c;
+  --tp-danger-soft: #fde2e7;
+  --tp-ok: #15803d;
+  --tp-ok-soft: #dcf5e3;
+  color-scheme: light;
+}
+
+.dark {
+  --tp-page: #0b1220;
+  --tp-surface: #111a2b;
+  --tp-surface-muted: #18243a;
+  --tp-line: #243250;
+  --tp-ink: #e6edf7;
+  --tp-muted: #93a3b8;
+  --tp-brand: #2dd4bf;
+  --tp-brand-strong: #5eead4;
+  --tp-brand-soft: #123a3a;
+  --tp-accent: #a5b4fc;
+  --tp-accent-soft: #232b55;
+  --tp-warn: #fbbf24;
+  --tp-warn-soft: #3a2c0c;
+  --tp-danger: #fb7185;
+  --tp-danger-soft: #3d1420;
+  --tp-ok: #4ade80;
+  --tp-ok-soft: #10301d;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --font-sans: "Inter", "Segoe UI", system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-mono: "JetBrains Mono", "Cascadia Code", ui-monospace, "SFMono-Regular", monospace;
+
+  --color-page: var(--tp-page);
+  --color-surface: var(--tp-surface);
+  --color-surface-muted: var(--tp-surface-muted);
+  --color-line: var(--tp-line);
+  --color-ink: var(--tp-ink);
+  --color-muted: var(--tp-muted);
+  --color-brand: var(--tp-brand);
+  --color-brand-strong: var(--tp-brand-strong);
+  --color-brand-soft: var(--tp-brand-soft);
+  --color-accent: var(--tp-accent);
+  --color-accent-soft: var(--tp-accent-soft);
+  --color-warn: var(--tp-warn);
+  --color-warn-soft: var(--tp-warn-soft);
+  --color-danger: var(--tp-danger);
+  --color-danger-soft: var(--tp-danger-soft);
+  --color-ok: var(--tp-ok);
+  --color-ok-soft: var(--tp-ok-soft);
+}
+
+@layer base {
+  html,
+  body {
+    @apply bg-page text-ink antialiased;
+    font-feature-settings: "cv11", "ss01";
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--tp-brand) 25%, transparent);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--tp-brand);
+    outline-offset: 2px;
+  }
+}
+
+/* Form controls share one look. */
+@layer components {
+  .input {
+    @apply w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink shadow-xs outline-none transition placeholder:text-muted/70 focus:border-brand focus:ring-2 focus:ring-brand/20 disabled:opacity-60;
+  }
+  .label {
+    @apply mb-1 block text-xs font-medium tracking-wide text-muted uppercase;
+  }
+  .panel {
+    @apply rounded-2xl border border-line bg-surface shadow-[0_1px_2px_rgba(15,27,45,0.04)];
+  }
+  .chip {
+    @apply inline-flex items-center gap-1 rounded-full border border-line bg-surface px-2.5 py-1 text-xs text-muted;
+  }
+}
+
+/* Timetable block colours by kind. */
+@layer components {
+  .kind-course { --kind: #0f766e; --kind-soft: #d5f5ef; }
+  .kind-study { --kind: #4f46e5; --kind-soft: #e5e4fd; }
+  .kind-activity { --kind: #c2410c; --kind-soft: #fde7d8; }
+  .kind-meeting { --kind: #0369a1; --kind-soft: #dbeefb; }
+  .kind-other { --kind: #475569; --kind-soft: #e7ecf1; }
+
+  .dark .kind-course { --kind: #5eead4; --kind-soft: #123a3a; }
+  .dark .kind-study { --kind: #a5b4fc; --kind-soft: #232b55; }
+  .dark .kind-activity { --kind: #fdba74; --kind-soft: #3d2312; }
+  .dark .kind-meeting { --kind: #7dd3fc; --kind-soft: #0d2f45; }
+  .dark .kind-other { --kind: #cbd5e1; --kind-soft: #233046; }
+
+  .block-kind {
+    background: var(--kind-soft);
+    border-left: 3px solid var(--kind);
+  }
+
+  .text-kind {
+    color: var(--kind);
+  }
+}
+
+/* Rendered assistant answers and study aids. */
+@layer components {
+  .answer {
+    @apply text-[0.95rem] leading-7;
+  }
+  .answer > * + * {
+    @apply mt-3;
+  }
+  .answer h1,
+  .answer h2,
+  .answer h3,
+  .answer h4 {
+    @apply font-semibold tracking-tight text-ink;
+  }
+  .answer h1 { @apply text-xl; }
+  .answer h2 { @apply text-lg; }
+  .answer h3,
+  .answer h4 { @apply text-base; }
+  .answer ul { @apply list-disc pl-5; }
+  .answer ol { @apply list-decimal pl-5; }
+  .answer li + li { @apply mt-1; }
+  .answer a { @apply text-brand underline underline-offset-2; }
+  .answer code { @apply rounded bg-surface-muted px-1 py-0.5 font-mono text-[0.85em]; }
+  .answer pre { @apply overflow-x-auto rounded-lg bg-surface-muted p-3 text-sm; }
+  .answer pre code { @apply bg-transparent p-0; }
+  .answer blockquote { @apply border-l-4 border-line pl-3 text-muted; }
+  .answer table { @apply w-full border-collapse text-sm; }
+  .answer th,
+  .answer td { @apply border border-line px-2 py-1 text-left align-top; }
+  .answer th { @apply bg-surface-muted font-medium; }
+  .answer .cite {
+    @apply ml-0.5 inline-flex h-4 min-w-4 items-center justify-center rounded bg-brand-soft px-1 align-text-top text-[0.65rem] font-semibold text-brand-strong no-underline;
+  }
+}
+
+@keyframes tw-pulse-dot {
+  0%, 80%, 100% { opacity: 0.25; }
+  40% { opacity: 1; }
+}
+
+.typing-dot {
+  animation: tw-pulse-dot 1.2s infinite ease-in-out;
+}
+.typing-dot:nth-child(2) { animation-delay: 0.15s; }
+.typing-dot:nth-child(3) { animation-delay: 0.3s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .typing-dot { animation: none; opacity: 0.6; }
+}

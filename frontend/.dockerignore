@@ -1,0 +1,8 @@
+# Installed and built artefacts are recreated inside the image.
+node_modules
+.nuxt
+.output
+
+# Local secrets never belong in an image.
+.env
+.env.*

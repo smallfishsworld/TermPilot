@@ -1,0 +1,73 @@
+# Full stack: API, web client, PostgreSQL and the search cluster for the document library.
+#
+#   cp backend/.env.example backend/.env    # fill in keys, or set TP_DEMO_MODE=true
+#   docker compose up --build
+#
+# Web client: http://localhost:3000   API docs: http://localhost:8000/docs
+name: termpilot
+
+services:
+  api:
+    build: ./backend
+    env_file: ./backend/.env
+    environment:
+      TP_DATABASE_URL: postgresql+psycopg2://termpilot:${POSTGRES_PASSWORD:-termpilot}@db:5432/termpilot
+      TP_SEARCH_URL: http://search:9200
+      TP_SEARCH_PASSWORD: ${SEARCH_PASSWORD:-change-me-please}
+      TP_CORS_ORIGINS: http://localhost:3000
+    ports:
+      - "8000:8000"
+    volumes:
+      - api-data:/data
+    depends_on:
+      db:
+        condition: service_healthy
+      search:
+        condition: service_healthy
+    restart: unless-stopped
+
+  web:
+    build:
+      context: ./frontend
+      args:
+        NUXT_PUBLIC_API_BASE: http://localhost:8000
+    ports:
+      - "3000:80"
+    depends_on:
+      - api
+    restart: unless-stopped
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: termpilot
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-termpilot}
+      POSTGRES_DB: termpilot
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U termpilot -d termpilot"]
+      interval: 5s
+      retries: 20
+    restart: unless-stopped
+
+  search:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.15.3
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: "true"
+      xpack.security.http.ssl.enabled: "false"
+      ELASTIC_PASSWORD: ${SEARCH_PASSWORD:-change-me-please}
+      ES_JAVA_OPTS: -Xms512m -Xmx512m
+    volumes:
+      - search-data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s -u elastic:$${ELASTIC_PASSWORD} http://localhost:9200/_cluster/health | grep -qv '\"status\":\"red\"'"]
+      interval: 10s
+      retries: 30
+    restart: unless-stopped
+
+volumes:
+  api-data:
+  db-data:
+  search-data:
